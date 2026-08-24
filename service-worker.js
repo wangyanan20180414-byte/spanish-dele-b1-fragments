@@ -1,4 +1,4 @@
-const CACHE_NAME = "spanish-dele-b1-plus-vocab-v8";
+const CACHE_NAME = "spanish-dele-b1-plus-vocab-v9";
 const APP_SHELL = [
   "./",
   "./index.html",
