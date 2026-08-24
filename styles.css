@@ -665,6 +665,55 @@ input {
   align-items: center;
 }
 
+.study-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.72rem;
+  margin-top: 0.9rem;
+}
+
+.shortcut-card {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.9rem 0.95rem;
+  border: 1px solid rgba(90, 76, 193, 0.14);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(236, 230, 255, 0.88));
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--anim), border-color var(--anim), box-shadow var(--anim), background var(--anim);
+}
+
+.shortcut-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(90, 76, 193, 0.28);
+}
+
+.shortcut-card.is-active {
+  border-color: rgba(90, 76, 193, 0.42);
+  box-shadow: 0 10px 24px rgba(90, 76, 193, 0.14);
+  background: linear-gradient(180deg, rgba(244, 240, 255, 0.98), rgba(226, 215, 255, 0.96));
+}
+
+.shortcut-card:disabled {
+  opacity: 0.52;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.shortcut-label {
+  font-family: "Trebuchet MS", "Gill Sans", "Segoe UI Variable Text", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.shortcut-count {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
 .note-list li,
 .focus-list li {
   margin-bottom: 0.65rem;
@@ -1268,6 +1317,10 @@ input {
 
   .card-focus-shell {
     gap: 0.7rem;
+  }
+
+  .study-shortcuts {
+    grid-template-columns: 1fr;
   }
 
   .card-focus-meta {

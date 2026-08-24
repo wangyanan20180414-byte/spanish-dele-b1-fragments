@@ -236,6 +236,33 @@ function setChapterFilter(filter) {
   renderChapter();
 }
 
+function applyStudyPreset(preset) {
+  state.mobileCardMode = "single";
+
+  if (preset === "new") {
+    state.chapterFilter = "new";
+    state.cardDirection = "es-zh";
+    state.hardOnly = false;
+  } else if (preset === "again") {
+    state.chapterFilter = "again";
+    state.cardDirection = "es-zh";
+    state.hardOnly = false;
+  } else if (preset === "hard") {
+    state.chapterFilter = "all";
+    state.cardDirection = "zh-es";
+    state.hardOnly = true;
+  } else {
+    state.chapterFilter = "all";
+    state.cardDirection = "es-zh";
+    state.hardOnly = false;
+  }
+
+  state.sprintReveal = false;
+  saveState();
+  renderChapter();
+  renderSprint();
+}
+
 function setCardMark(cardId, mark) {
   const chapter = selectedChapter();
   const previousVisibleCards = visibleCardsForChapter(chapter);
@@ -637,7 +664,7 @@ function memoryCardMarkup(card) {
 function renderChapter() {
   const chapter = selectedChapter();
   const progress = chapterProgress(chapter);
-  const points = chapter.points || [];
+  const hardCount = cardsForChapter(chapter).filter((card) => cardMark(card.id) === "again").length;
   const chapterCards = visibleCardsForChapter(chapter);
   const filter = state.chapterFilter || "all";
   const singleMode = isPhoneLayout() && state.mobileCardMode === "single";
@@ -661,6 +688,26 @@ function renderChapter() {
       <div class="card-hard-toggle">
         <button class="view-pill ${hardOnlyActive ? "is-active" : ""}" data-hard-only="toggle">难词</button>
       </div>
+    </div>
+  `;
+  const shortcutMarkup = `
+    <div class="study-shortcuts">
+      <button class="shortcut-card ${filter === "new" && state.cardDirection === "es-zh" && !hardOnlyActive ? "is-active" : ""}" data-study-preset="new" ${progress.fresh ? "" : "disabled"}>
+        <span class="shortcut-label">新卡</span>
+        <span class="shortcut-count">${progress.fresh} 张</span>
+      </button>
+      <button class="shortcut-card ${filter === "again" && state.cardDirection === "es-zh" && !hardOnlyActive ? "is-active" : ""}" data-study-preset="again" ${progress.review ? "" : "disabled"}>
+        <span class="shortcut-label">再看</span>
+        <span class="shortcut-count">${progress.review} 张</span>
+      </button>
+      <button class="shortcut-card ${hardOnlyActive ? "is-active" : ""}" data-study-preset="hard" ${hardCount ? "" : "disabled"}>
+        <span class="shortcut-label">中→西难词</span>
+        <span class="shortcut-count">${hardCount} 张</span>
+      </button>
+      <button class="shortcut-card ${filter === "all" && state.cardDirection === "es-zh" && !hardOnlyActive ? "is-active" : ""}" data-study-preset="all" ${progress.total ? "" : "disabled"}>
+        <span class="shortcut-label">全章顺刷</span>
+        <span class="shortcut-count">${progress.total} 张</span>
+      </button>
     </div>
   `;
 
@@ -710,24 +757,13 @@ function renderChapter() {
         </div>
       </div>
       <p class="panel-note">${filterLabel}</p>
+      ${shortcutMarkup}
       ${
         progress.known === progress.total && filter === "all"
           ? `<p class="panel-note">本主题现有词卡已全部标记为记住。</p>`
           : ""
       }
       ${cardsMarkup}
-    </section>
-
-    <section class="panel">
-      <details class="knowledge-toggle">
-        <summary>
-          <span>主题范围</span>
-          <span class="meta-pill">${points.length} 条</span>
-        </summary>
-        <ul class="note-list">
-          ${points.map((item) => `<li>${item}</li>`).join("")}
-        </ul>
-      </details>
     </section>
 
     <article class="chapter-hero" style="--chapter-accent:${chapter.accent};">
@@ -760,6 +796,10 @@ function renderChapter() {
 
   chapterDetail.querySelectorAll("[data-hard-only]").forEach((button) => {
     button.addEventListener("click", () => setHardOnly());
+  });
+
+  chapterDetail.querySelectorAll("[data-study-preset]").forEach((button) => {
+    button.addEventListener("click", () => applyStudyPreset(button.dataset.studyPreset));
   });
 
   chapterDetail.querySelectorAll("[data-card-nav]").forEach((button) => {
