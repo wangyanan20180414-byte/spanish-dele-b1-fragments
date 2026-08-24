@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Español DELE B1+ Vocab</title>
+    <meta name="theme-color" content="#18293a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Español DELE B1+ Vocab" />
+    <meta
+      name="description"
+      content="A lightweight Spanish DELE B1+ vocabulary page for topic study and quick review."
+    />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="./icons/icon-180.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <div id="toast" class="toast" aria-live="polite" aria-atomic="true"></div>
+    <button id="sidebarOverlay" class="sidebar-overlay" type="button" aria-label="关闭主题列表"></button>
+    <nav id="mobileBottomNav" class="mobile-bottom-nav" aria-label="手机导航">
+      <button class="mobile-tab" data-mobile-action="chapters" type="button">主题</button>
+      <button class="mobile-tab" data-mobile-action="study" type="button">学习</button>
+      <button class="mobile-tab" data-mobile-action="sprint" type="button">快练</button>
+    </nav>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <label class="search-box">
+          <span>查找主题</span>
+          <input id="chapterSearch" type="search" placeholder="viajes, trabajo, salud..." />
+        </label>
+
+        <nav id="chapterList" class="chapter-list" aria-label="Topics"></nav>
+      </aside>
+
+      <main class="workspace">
+        <section class="hero-panel">
+          <div id="heroSummary" class="hero-summary" aria-live="polite"></div>
+          <div class="hero-actions">
+            <button id="mobileNavToggle" class="button button-secondary button-mobile-nav" type="button">
+              主题
+            </button>
+            <button id="startSprint" class="button button-primary">抽一张</button>
+          </div>
+
+          <div id="statsGrid" class="stats-grid" aria-live="polite"></div>
+        </section>
+
+        <section id="chapterDetail" class="chapter-detail" aria-live="polite"></section>
+
+        <section class="sprint-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">快练</p>
+              <h3>快速回忆</h3>
+            </div>
+            <p class="panel-note">从当前主题随机抽一张。</p>
+          </div>
+
+          <div id="sprintCard" class="sprint-card"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./data.js"></script>
+    <script src="./generated-cards.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
