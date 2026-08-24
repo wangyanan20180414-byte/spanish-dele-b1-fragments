@@ -19,7 +19,7 @@ const defaultState = {
   progress: {},
   chapterFilter: "all",
   mobileTab: "study",
-  mobileCardMode: "single",
+  mobileCardMode: "batch",
   cardDirection: "es-zh",
   hardOnly: false,
   chapterCardCursor: {},
@@ -54,9 +54,14 @@ function loadState() {
     const raw = localStorage.getItem(STUDY_DATA.storageKey);
     if (!raw) return cloneDefaultState();
     const parsed = JSON.parse(raw);
+    const mobileCardMode =
+      parsed.mobileCardMode === "all" || parsed.mobileCardMode === "batch"
+        ? parsed.mobileCardMode
+        : defaultState.mobileCardMode;
     return {
       ...cloneDefaultState(),
       ...parsed,
+      mobileCardMode,
       progress: parsed.progress || {},
       chapterCardCursor: parsed.chapterCardCursor || {},
     };
@@ -237,7 +242,7 @@ function setChapterFilter(filter) {
 }
 
 function applyStudyPreset(preset) {
-  state.mobileCardMode = "single";
+  state.mobileCardMode = isPhoneLayout() ? "batch" : state.mobileCardMode;
 
   if (preset === "new") {
     state.chapterFilter = "new";
@@ -281,7 +286,7 @@ function setCardMark(cardId, mark) {
   renderSprint();
   const card = allCards.find((item) => item.id === cardId);
   if (!card) return;
-  if (isPhoneLayout() && state.mobileCardMode === "single") return;
+  if (isPhoneLayout() && state.mobileCardMode !== "all") return;
   if (nextMark === "known") showToast(`已标记为记住: ${card.chapterTitle}`);
   else if (nextMark === "again") showToast(`已标记为再看: ${card.chapterTitle}`);
   else showToast(`已清除标记: ${card.chapterTitle}`);
@@ -423,6 +428,25 @@ function visibleCardsForChapter(chapter) {
   }
 
   return cards;
+}
+
+function markPriority(mark) {
+  if (mark === "new") return 0;
+  if (mark === "again") return 1;
+  return 2;
+}
+
+function orderedStudyCards(cards, filter) {
+  if (filter !== "all") return cards;
+
+  return cards
+    .map((card, index) => ({
+      card,
+      index,
+      priority: markPriority(cardMark(card.id)),
+    }))
+    .sort((left, right) => left.priority - right.priority || left.index - right.index)
+    .map((entry) => entry.card);
 }
 
 function maybeAdvanceSingleCard(cardId, previousIndex) {
@@ -667,7 +691,9 @@ function renderChapter() {
   const hardCount = cardsForChapter(chapter).filter((card) => cardMark(card.id) === "again").length;
   const chapterCards = visibleCardsForChapter(chapter);
   const filter = state.chapterFilter || "all";
+  const orderedCards = orderedStudyCards(chapterCards, filter);
   const singleMode = isPhoneLayout() && state.mobileCardMode === "single";
+  const batchMode = isPhoneLayout() && state.mobileCardMode === "batch";
   const hardOnlyActive = state.cardDirection === "zh-es" && state.hardOnly;
   const filterLabel = {
     all: hardOnlyActive ? `只显示中→西难词 ${chapterCards.length} 张` : `显示 ${progress.total} 张词卡`,
@@ -679,6 +705,7 @@ function renderChapter() {
     <div class="card-toolbar">
       <div class="card-view-toggle">
         <button class="view-pill ${state.mobileCardMode === "single" ? "is-active" : ""}" data-view-mode="single">单卡</button>
+        <button class="view-pill ${state.mobileCardMode === "batch" ? "is-active" : ""}" data-view-mode="batch">5张</button>
         <button class="view-pill ${state.mobileCardMode === "all" ? "is-active" : ""}" data-view-mode="all">全部</button>
       </div>
       <div class="card-direction-toggle">
@@ -713,15 +740,15 @@ function renderChapter() {
 
   let cardsMarkup = `<p class="empty-cards">这个筛选下暂时没有词卡。</p>`;
 
-  if (chapterCards.length) {
+  if (orderedCards.length) {
     if (singleMode) {
-      const cursor = chapterCardCursor(chapter.slug, chapterCards.length);
-      const card = chapterCards[cursor];
+      const cursor = chapterCardCursor(chapter.slug, orderedCards.length);
+      const card = orderedCards[cursor];
       cardsMarkup = `
         ${viewToggle}
         <div class="card-focus-shell">
           <div class="card-focus-meta">
-            <span class="focus-counter">第 ${cursor + 1} / ${chapterCards.length} 张</span>
+            <span class="focus-counter">第 ${cursor + 1} / ${orderedCards.length} 张</span>
           </div>
           ${memoryCardMarkup(card)}
           <div class="card-carousel-actions">
@@ -730,11 +757,25 @@ function renderChapter() {
           </div>
         </div>
       `;
+    } else if (batchMode) {
+      const batchCards = orderedCards.slice(0, 5);
+      cardsMarkup = `
+        ${viewToggle}
+        <div class="card-focus-shell">
+          <div class="card-focus-meta">
+            <span class="focus-counter">当前 5 张</span>
+            <span class="focus-counter">剩余 ${orderedCards.length} 张</span>
+          </div>
+          <div class="card-grid card-grid-batch">
+            ${batchCards.map((card) => memoryCardMarkup(card)).join("")}
+          </div>
+        </div>
+      `;
     } else {
       cardsMarkup = `
         ${viewToggle}
         <div class="card-grid">
-          ${chapterCards.map((card) => memoryCardMarkup(card)).join("")}
+          ${orderedCards.map((card) => memoryCardMarkup(card)).join("")}
         </div>
       `;
     }

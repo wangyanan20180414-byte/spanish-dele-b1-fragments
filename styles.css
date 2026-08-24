@@ -777,6 +777,10 @@ input {
   margin-top: 0.9rem;
 }
 
+.card-grid-batch {
+  margin-top: 0;
+}
+
 .empty-cards {
   margin: 0;
   padding: 1rem;
@@ -1369,9 +1373,17 @@ input {
   }
 
   .card-direction-toggle .view-pill,
-  .card-view-toggle .view-pill {
-    flex: 1 1 calc(50% - 0.25rem);
+  .card-view-toggle .view-pill,
+  .card-grid-batch .memory-actions .button {
     justify-content: center;
+  }
+
+  .card-direction-toggle .view-pill {
+    flex: 1 1 calc(50% - 0.25rem);
+  }
+
+  .card-view-toggle .view-pill {
+    flex: 1 1 calc(33.333% - 0.35rem);
   }
 
   .card-hard-toggle .view-pill {
