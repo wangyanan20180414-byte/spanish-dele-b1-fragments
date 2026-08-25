@@ -674,7 +674,7 @@ function memoryCardMarkup(card) {
       ${reverse ? `<p class="memory-direction">中文提示，先自己想西语。</p>` : ""}
       <p class="memory-front">${cardPrompt(card)}</p>
       <details class="memory-answer">
-        <summary aria-label="切换答案"><span class="sr-only">显示答案</span></summary>
+        <summary aria-label="切换答案"></summary>
         ${cardAnswerMarkup(card)}
       </details>
       <div class="memory-actions">

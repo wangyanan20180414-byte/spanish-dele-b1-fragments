@@ -1,4 +1,4 @@
-const CACHE_NAME = "spanish-dele-b1-plus-vocab-v9";
+const CACHE_NAME = "spanish-dele-b1-plus-vocab-v10";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,9 +7,9 @@ const APP_SHELL = [
   "./generated-cards.js",
   "./app.js",
   "./manifest.webmanifest",
-  "./icons/icon-180.png",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png",
+  "./icons/app-icon-es-180.png",
+  "./icons/app-icon-es-192.png",
+  "./icons/app-icon-es-512.png",
 ];
 
 self.addEventListener("install", (event) => {
